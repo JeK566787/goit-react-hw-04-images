@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import css from './App.module.css';
 import { fetchImages } from 'services/API';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -6,70 +5,65 @@ import { Modal } from './Modal/Modal';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
-export class App extends Component {
-  state = {
-    query: '',
-    images: [],
-    largeImgUrl: '',
-    page: 1,
-    showBtn: false,
-    error: null,
-    isEmpty: false,
-    isLoading: false,
-  };
+import { useState, useEffect } from 'react';
 
-  componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
-      this.setState({ isLoading: true });
-      fetchImages(query, page)
-        .then(({ hits, totalHits }) => {
-          if (hits.length === 0) {
-            this.setState({ isEmpty: true });
-            return;
-          }
-          this.setState(prevState => ({
-            images: [...prevState.images, ...hits],
-            showBtn: page < Math.ceil(totalHits / 15),
-          }));
-        })
-        .catch(error => this.setState({ error: error.message }))
-        .finally(() => this.setState({ isLoading: false }));
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [largeImgUrl, setLargeImagesUrl] = useState('');
+  const [page, setPage] = useState(1);
+  const [showBtn, setShowBtn] = useState(false);
+  const [error, setError] = useState(null);
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!query) {
+      return;
     }
-  }
+    setIsLoading(true);
+    fetchImages(query, page)
+      .then(({ hits, totalHits }) => {
+        if (hits.length === 0) {
+          setIsEmpty(true);
+          return;
+        }
+        setImages(prevState => [...prevState, ...hits]);
+        setShowBtn(page < Math.ceil(totalHits / 15));
+      })
+      .catch(error => setError(error.message))
+      .finally(() => setIsLoading(false));
+  }, [query, page]);
 
-  onFormSubmit = query => {
-    this.setState({ query: query, images: [], page: 1, error: null });
+  const onFormSubmit = query => {
+    setQuery(query);
+    setImages([]);
+    setPage(1);
+    setError(null);
   };
 
-  setLargeImageURL = largeImageURL => {
-    this.setState({ largeImgUrl: largeImageURL });
+  const setLargeImageURL = largeImageURL => {
+    setLargeImagesUrl(largeImageURL);
   };
-  onBtnClick = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const onBtnClick = () => {
+    setPage(prevState => prevState + 1);
   };
-  render() {
-    return (
-      <div className={css.App}>
-        <Searchbar onFormSubmit={this.onFormSubmit} />
-        {this.state.isEmpty && (
-          <p>Nothing is found for this {this.state.query}</p>
-        )}
-        {this.state.error && <p>something wrong {this.state.error}</p>}
-        <div>{this.state.selectedPostId}</div>
-        <ImageGallery
-          images={this.state.images}
-          setLargeImageURL={this.setLargeImageURL}
+
+  return (
+    <div className={css.App}>
+      <Searchbar onFormSubmit={onFormSubmit} />
+      {isEmpty && <p>Nothing is found for this {query}</p>}
+      {error && <p>something wrong {error}</p>}
+
+      <ImageGallery images={images} setLargeImageURL={setLargeImageURL} />
+      {isLoading && <Loader />}
+      {showBtn && <Button onBtnClick={onBtnClick} />}
+      {largeImgUrl && (
+        <Modal
+          setLargeImageURL={setLargeImageURL}
+          largeImageURL={largeImgUrl}
         />
-        {this.state.isLoading && <Loader />}
-        {this.state.showBtn && <Button onBtnClick={this.onBtnClick} />}
-        {this.state.largeImgUrl && (
-          <Modal
-            setLargeImageURL={this.setLargeImageURL}
-            largeImageURL={this.state.largeImgUrl}
-          />
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
