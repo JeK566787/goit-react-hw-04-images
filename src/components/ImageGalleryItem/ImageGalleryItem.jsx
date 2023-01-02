@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 export const ImageGalleryItem = ({
   webformatURL,
   largeImageURL,
-  setLargeImageURL,
   alt,
+  onImageClick,
 }) => {
   return (
     <li className={css.ImageGalleryItem}>
@@ -13,7 +13,7 @@ export const ImageGalleryItem = ({
         className={css.ImageGalleryItemImage}
         src={webformatURL}
         alt={alt}
-        onClick={() => setLargeImageURL(largeImageURL)}
+        onClick={() => onImageClick(largeImageURL)}
       />
     </li>
   );

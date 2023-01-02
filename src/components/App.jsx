@@ -42,7 +42,7 @@ export const App = () => {
     setError(null);
   };
 
-  const setLargeImageURL = largeImageURL => {
+  const onImageClick = largeImageURL => {
     setLargeImagesUrl(largeImageURL);
   };
   const onBtnClick = () => {
@@ -55,14 +55,11 @@ export const App = () => {
       {isEmpty && <p>Nothing is found for this {query}</p>}
       {error && <p>something wrong {error}</p>}
 
-      <ImageGallery images={images} setLargeImageURL={setLargeImageURL} />
+      <ImageGallery images={images} onImageClick={onImageClick} />
       {isLoading && <Loader />}
       {showBtn && <Button onBtnClick={onBtnClick} />}
       {largeImgUrl && (
-        <Modal
-          setLargeImageURL={setLargeImageURL}
-          largeImageURL={largeImgUrl}
-        />
+        <Modal onImageClick={onImageClick} largeImageURL={largeImgUrl} />
       )}
     </div>
   );

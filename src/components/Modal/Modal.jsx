@@ -2,26 +2,25 @@ import css from './Modal.module.css';
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 
-export const Modal = ({ setLargeImageURL, largeImageURL }) => {
+export const Modal = ({ onImageClick, largeImageURL }) => {
   useEffect(() => {
     const onEscapePress = e => {
       if (e.code === 'Escape') {
-        setLargeImageURL('');
+        onImageClick('');
       }
     };
     window.addEventListener('keydown', onEscapePress);
     return () => window.removeEventListener('keydown', onEscapePress);
-  }, [setLargeImageURL]);
+  }, [onImageClick]);
 
-  const handleClick = e => {
-    console.log(e);
+  const backdropClick = e => {
     if (e.target === e.currentTarget) {
-      setLargeImageURL('');
+      onImageClick('');
     }
   };
 
   return (
-    <div className={css.Overlay} onClick={handleClick}>
+    <div className={css.Overlay} onClick={backdropClick}>
       <div className={css.Modal}>
         <img src={largeImageURL} alt="" />
       </div>
