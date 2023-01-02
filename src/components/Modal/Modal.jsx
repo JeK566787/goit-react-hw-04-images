@@ -9,12 +9,12 @@ export const Modal = ({ setLargeImageURL, largeImageURL }) => {
         setLargeImageURL('');
       }
     };
-
-    document.addEventListener('keydown', onEscapePress);
-    return document.removeEventListener('keydown', onEscapePress);
+    window.addEventListener('keydown', onEscapePress);
+    return () => window.removeEventListener('keydown', onEscapePress);
   }, [setLargeImageURL]);
 
   const handleClick = e => {
+    console.log(e);
     if (e.target === e.currentTarget) {
       setLargeImageURL('');
     }
